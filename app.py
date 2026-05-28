@@ -64,10 +64,23 @@ st.markdown(
     section[data-testid="stSidebar"] input,
     section[data-testid="stSidebar"] textarea,
     section[data-testid="stSidebar"] select {
-        background-color: rgba(255, 255, 255, 0.08) !important;
-        border: 1px solid rgba(203, 213, 225, 0.24) !important;
+        background-color: #ffffff !important;
+        border: 1px solid rgba(203, 213, 225, 0.5) !important;
         border-radius: 12px !important;
-        color: #ffffff !important;
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
+    }
+
+    section[data-testid="stSidebar"] input::placeholder,
+    section[data-testid="stSidebar"] textarea::placeholder {
+        color: #6b7280 !important;
+        -webkit-text-fill-color: #6b7280 !important;
+    }
+
+    section[data-testid="stSidebar"] [data-testid="stTextInput"] input {
+        color: #000000 !important;
+        -webkit-text-fill-color: #000000 !important;
+        caret-color: #000000 !important;
     }
 
     section[data-testid="stSidebar"] .stSlider {
