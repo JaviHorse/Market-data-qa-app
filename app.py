@@ -25,33 +25,28 @@ st.set_page_config(
 st.markdown(
     """
     <style>
-    /* Import clean corporate-style typography */
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
     html, body, [class*="css"] {
         font-family: 'Inter', sans-serif;
     }
 
-    /* Main app background */
     .stApp {
         background:
             radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 30%),
             linear-gradient(180deg, #f8fafc 0%, #eef2f7 100%);
     }
 
-    /* Hide default Streamlit clutter */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
 
-    /* Page spacing */
     .block-container {
         padding-top: 2.2rem;
         padding-bottom: 3rem;
         max-width: 1450px;
     }
 
-    /* Sidebar styling */
     section[data-testid="stSidebar"] {
         background: linear-gradient(180deg, #0f172a 0%, #111827 55%, #1e293b 100%);
         border-right: 1px solid rgba(148, 163, 184, 0.18);
@@ -71,24 +66,12 @@ st.markdown(
         -webkit-text-fill-color: #000000 !important;
     }
 
-    section[data-testid="stSidebar"] input::placeholder,
-    section[data-testid="stSidebar"] textarea::placeholder {
-        color: #6b7280 !important;
-        -webkit-text-fill-color: #6b7280 !important;
-    }
-
     section[data-testid="stSidebar"] [data-testid="stTextInput"] input {
         color: #000000 !important;
         -webkit-text-fill-color: #000000 !important;
         caret-color: #000000 !important;
     }
 
-    section[data-testid="stSidebar"] .stSlider {
-        padding-top: 0.35rem;
-        padding-bottom: 0.35rem;
-    }
-
-    /* Corporate hero */
     .hero-card {
         position: relative;
         overflow: hidden;
@@ -178,7 +161,6 @@ st.markdown(
         font-weight: 600;
     }
 
-    /* Section headers */
     .section-heading {
         margin-top: 10px;
         margin-bottom: 16px;
@@ -208,16 +190,6 @@ st.markdown(
         line-height: 1.55;
     }
 
-    /* Professional cards */
-    .soft-card {
-        background: rgba(255, 255, 255, 0.88);
-        border: 1px solid rgba(203, 213, 225, 0.78);
-        border-radius: 22px;
-        padding: 22px;
-        box-shadow: 0 12px 34px rgba(15, 23, 42, 0.07);
-        margin-bottom: 18px;
-    }
-
     .upload-help-box {
         border: 1px solid rgba(37, 99, 235, 0.18);
         background:
@@ -242,7 +214,6 @@ st.markdown(
         letter-spacing: 0.02em;
     }
 
-    /* Streamlit widgets */
     div[data-testid="stFileUploader"] {
         background: rgba(255, 255, 255, 0.88);
         border: 1px dashed rgba(37, 99, 235, 0.35);
@@ -282,7 +253,6 @@ st.markdown(
         transform: none !important;
     }
 
-    /* Metric cards */
     div[data-testid="stMetric"] {
         background: rgba(255, 255, 255, 0.92);
         border: 1px solid rgba(203, 213, 225, 0.7);
@@ -302,7 +272,6 @@ st.markdown(
         letter-spacing: -0.04em;
     }
 
-    /* Dataframes and charts */
     div[data-testid="stDataFrame"] {
         border-radius: 18px;
         overflow: hidden;
@@ -317,7 +286,6 @@ st.markdown(
         box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
     }
 
-    /* Loading overlay */
     .ai-loading-overlay {
         position: fixed;
         z-index: 9999;
@@ -373,13 +341,11 @@ st.markdown(
         line-height: 1.6;
     }
 
-    /* Make warnings/info feel less default */
     div[data-testid="stAlert"] {
         border-radius: 18px;
         border: 1px solid rgba(203, 213, 225, 0.75);
     }
 
-    /* Mobile responsiveness */
     @media (max-width: 768px) {
         .hero-card {
             padding: 26px 24px;
@@ -398,6 +364,27 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
+
+# -----------------------------
+# UI Helper Functions
+# -----------------------------
+def show_loading_overlay(max_rows):
+    return st.markdown(
+        f"""
+        <div class="ai-loading-overlay">
+            <div class="ai-loading-card">
+                <div class="ai-spinner"></div>
+                <div class="ai-loading-title">Generating AI Analyst Notes</div>
+                <div class="ai-loading-text">
+                    Gemini is reviewing the top {max_rows} highest-risk market data records.<br>
+                    Please wait while the analyst notes are being generated.
+                </div>
+            </div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
 
 
 def section_header(kicker, title, caption=""):
@@ -463,6 +450,9 @@ def risk_line_chart(df):
     st.altair_chart(chart, use_container_width=True)
 
 
+# -----------------------------
+# Hero Section
+# -----------------------------
 st.markdown(
     """
     <div class="hero-card">
@@ -569,7 +559,7 @@ except Exception:
 
 
 # -----------------------------
-# Helper Functions
+# Data Helper Functions
 # -----------------------------
 def clean_numeric(value):
     if pd.isna(value):
@@ -760,11 +750,13 @@ st.sidebar.markdown("## Configuration Panel")
 st.sidebar.caption("Set the market-data parameters before running the QA workflow.")
 st.sidebar.markdown("---")
 st.sidebar.markdown("### Security & Instrument")
+
 ticker_input = st.sidebar.text_input("Ticker", value="AXP")
 company_input = st.sidebar.text_input("Company Name", value="American Express")
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("### QA Thresholds")
+
 vendor_mismatch_threshold = st.sidebar.slider(
     "Vendor Mismatch Threshold",
     min_value=0.005,
@@ -806,7 +798,11 @@ max_ai_note_rows = st.sidebar.slider(
 # -----------------------------
 # File Upload
 # -----------------------------
-section_header("Input", "Upload Historical Equity Market Data", "Use an Investing.com-style CSV export or any file with the required historical price columns.")
+section_header(
+    "Input",
+    "Upload Historical Equity Market Data",
+    "Use an Investing.com-style CSV export or any file with the required historical price columns."
+)
 
 st.markdown(
     """
@@ -852,7 +848,6 @@ except Exception:
 
 
 required_cols = ["Date", "Price", "Open", "High", "Low", "Vol.", "Change %"]
-
 missing_cols = [col for col in required_cols if col not in raw_df.columns]
 
 if missing_cols:
@@ -870,14 +865,12 @@ st.dataframe(raw_df.head(10), use_container_width=True)
 stock_df = raw_df.copy()
 
 stock_df["Date"] = pd.to_datetime(stock_df["Date"], errors="coerce")
-
 stock_df["Close Price"] = stock_df["Price"].apply(clean_numeric)
 
 for col in ["Open", "High", "Low"]:
     stock_df[col] = stock_df[col].apply(clean_numeric)
 
 stock_df["Volume Numeric"] = stock_df["Vol."].apply(clean_volume)
-
 stock_df["Change %"] = stock_df["Change %"].apply(clean_numeric) / 100
 
 stock_df["Ticker"] = ticker_input
@@ -1028,7 +1021,6 @@ stock_df["ML_Review_Label"] = stock_df["ML_Review_Prediction"].map({
 stock_df["ML_Risk_Probability_%"] = stock_df["ML_Risk_Probability"] * 100
 stock_df["ML_Risk_Band"] = stock_df["ML_Risk_Probability"].apply(assign_ml_risk_band)
 
-# First generate rule-based notes for all records
 stock_df["Analyst_Review_Note"] = stock_df.apply(generate_basic_analyst_note, axis=1)
 stock_df["Note_Source"] = "Rule-Based"
 
@@ -1038,7 +1030,7 @@ stock_df["Note_Source"] = "Rule-Based"
 # -----------------------------
 if st.session_state.generate_ai_notes:
     if "GEMINI_API_KEY" not in st.secrets:
-        st.warning("No Gemini API key found. Add GEMINI_API_KEY to .streamlit/secrets.toml.")
+        st.warning("No Gemini API key found. Add GEMINI_API_KEY in Streamlit secrets.")
     else:
         overlay = show_loading_overlay(max_ai_note_rows)
 
