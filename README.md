@@ -10,7 +10,7 @@ This project was built to demonstrate workflows similar to those used in **Instr
 
 This project has two main components:
 
-1. **Looker Studio Market Data Quality Dashboard**
+1. **Market Data Quality Dashboard**
 
    * Monitors equity market data quality across historical stock records.
    * Flags vendor price mismatches, abnormal returns, volume spikes, and high-risk records.
