@@ -39,10 +39,53 @@ st.markdown(
 
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
-    header {visibility: hidden;}
+
+    /*
+    SIDEBAR BUTTON FIX:
+    Do not hide the Streamlit header, toolbar, or decoration containers.
+    In several Streamlit versions, the sidebar toggle is nested inside them.
+    */
+    header[data-testid="stHeader"] {
+        visibility: visible !important;
+        display: block !important;
+        height: 3.25rem !important;
+        background: rgba(248, 250, 252, 0.92) !important;
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(226, 232, 240, 0.65);
+        z-index: 999998 !important;
+    }
+
+    header[data-testid="stHeader"] * {
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    [data-testid="collapsedControl"] {
+        visibility: visible !important;
+        display: flex !important;
+        opacity: 1 !important;
+        position: fixed !important;
+        top: 0.65rem !important;
+        left: 0.75rem !important;
+        z-index: 999999 !important;
+        background: rgba(255, 255, 255, 0.92) !important;
+        border: 1px solid rgba(203, 213, 225, 0.90) !important;
+        border-radius: 12px !important;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12) !important;
+    }
+
+    [data-testid="stSidebarCollapsedControl"],
+    [data-testid="stSidebarCollapseButton"],
+    [data-testid="stBaseButton-headerNoPadding"],
+    button[kind="header"] {
+        visibility: visible !important;
+        display: flex !important;
+        opacity: 1 !important;
+        z-index: 999999 !important;
+    }
 
     .block-container {
-        padding-top: 2.2rem;
+        padding-top: 3.4rem;
         padding-bottom: 3rem;
         max-width: 1450px;
     }
@@ -70,6 +113,19 @@ st.markdown(
         color: #000000 !important;
         -webkit-text-fill-color: #000000 !important;
         caret-color: #000000 !important;
+    }
+
+    .mobile-sidebar-note {
+        display: none;
+        margin-bottom: 16px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: rgba(239, 246, 255, 0.92);
+        border: 1px solid rgba(37, 99, 235, 0.20);
+        color: #1e3a8a;
+        font-size: 13px;
+        line-height: 1.5;
+        font-weight: 600;
     }
 
     .hero-card {
@@ -347,6 +403,14 @@ st.markdown(
     }
 
     @media (max-width: 768px) {
+        .block-container {
+            padding-top: 3.7rem;
+        }
+
+        .mobile-sidebar-note {
+            display: block;
+        }
+
         .hero-card {
             padding: 26px 24px;
             border-radius: 22px;
@@ -358,6 +422,11 @@ st.markdown(
 
         .hero-subtitle {
             font-size: 15px;
+        }
+
+        .ai-loading-card {
+            width: 88%;
+            padding: 28px 22px;
         }
     }
     </style>
@@ -421,7 +490,12 @@ def count_bar_chart(series, category_name, value_name="Records"):
         )
         .properties(height=285)
         .configure_view(strokeWidth=0)
-        .configure_axis(labelColor="#475569", titleColor="#64748b", labelFontSize=12, titleFontSize=12)
+        .configure_axis(
+            labelColor="#475569",
+            titleColor="#64748b",
+            labelFontSize=12,
+            titleFontSize=12
+        )
     )
 
     st.altair_chart(chart, use_container_width=True)
@@ -439,15 +513,37 @@ def risk_line_chart(df):
             y=alt.Y("ML_Risk_Probability_%:Q", title="ML Risk Probability (%)"),
             tooltip=[
                 alt.Tooltip("Date:T", title="Date"),
-                alt.Tooltip("ML_Risk_Probability_%:Q", title="ML Risk Probability", format=".2f")
+                alt.Tooltip(
+                    "ML_Risk_Probability_%:Q",
+                    title="ML Risk Probability",
+                    format=".2f"
+                )
             ]
         )
         .properties(height=320)
         .configure_view(strokeWidth=0)
-        .configure_axis(labelColor="#475569", titleColor="#64748b", labelFontSize=12, titleFontSize=12)
+        .configure_axis(
+            labelColor="#475569",
+            titleColor="#64748b",
+            labelFontSize=12,
+            titleFontSize=12
+        )
     )
 
     st.altair_chart(chart, use_container_width=True)
+
+
+# -----------------------------
+# Mobile Sidebar Notice
+# -----------------------------
+st.markdown(
+    """
+    <div class="mobile-sidebar-note">
+        Tip: On smaller screens, tap the sidebar arrow/menu button in the top-left corner to open the Configuration Panel.
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 
 # -----------------------------
@@ -855,7 +951,12 @@ if missing_cols:
     st.stop()
 
 
-section_header("Preview", "Uploaded Data Preview", "First 10 rows from the uploaded file before QA processing.")
+section_header(
+    "Preview",
+    "Uploaded Data Preview",
+    "First 10 rows from the uploaded file before QA processing."
+)
+
 st.dataframe(raw_df.head(10), use_container_width=True)
 
 
@@ -1064,7 +1165,11 @@ if st.session_state.generate_ai_notes:
 # -----------------------------
 # Dashboard Summary
 # -----------------------------
-section_header("Executive Summary", "Market Data QA Summary", "High-level QA counts, model risk, and AI note coverage.")
+section_header(
+    "Executive Summary",
+    "Market Data QA Summary",
+    "High-level QA counts, model risk, and AI note coverage."
+)
 
 total_records = len(stock_df)
 rule_flagged_records = int((stock_df["Issue Type"] != "Clean").sum())
@@ -1094,7 +1199,11 @@ col8.metric("Volume Spikes", f"{volume_spike_count:,}")
 # -----------------------------
 # Charts
 # -----------------------------
-section_header("Diagnostics", "QA Breakdown", "Breakdown of rule-based flags, ML risk bands, note sources, and risk levels.")
+section_header(
+    "Diagnostics",
+    "QA Breakdown",
+    "Breakdown of rule-based flags, ML risk bands, note sources, and risk levels."
+)
 
 chart_col1, chart_col2 = st.columns(2)
 
@@ -1106,7 +1215,6 @@ with chart_col2:
     st.markdown("#### ML Risk Band Distribution")
     count_bar_chart(stock_df["ML_Risk_Band"], "ML Risk Band")
 
-
 chart_col3, chart_col4 = st.columns(2)
 
 with chart_col3:
@@ -1117,7 +1225,6 @@ with chart_col4:
     st.markdown("#### Risk Level Distribution")
     count_bar_chart(stock_df["Risk Level"], "Risk Level")
 
-
 st.markdown("#### ML Risk Probability Over Time")
 
 risk_time_df = stock_df[["Date", "ML_Risk_Probability_%"]].copy()
@@ -1127,7 +1234,11 @@ risk_line_chart(risk_time_df)
 # -----------------------------
 # Review Queue
 # -----------------------------
-section_header("Review Queue", "AI-Assisted Analyst Review Queue", "Records are sorted by ML risk probability so analysts can prioritize the highest-risk rows first.")
+section_header(
+    "Review Queue",
+    "AI-Assisted Analyst Review Queue",
+    "Records are sorted by ML risk probability so analysts can prioritize the highest-risk rows first."
+)
 
 review_queue = stock_df[
     [
@@ -1160,7 +1271,11 @@ st.dataframe(review_queue, use_container_width=True)
 # -----------------------------
 # Download Output
 # -----------------------------
-section_header("Export", "Download Scored Output", "Download the complete QA-scored dataset with all flags, model scores, risk bands, and analyst notes.")
+section_header(
+    "Export",
+    "Download Scored Output",
+    "Download the complete QA-scored dataset with all flags, model scores, risk bands, and analyst notes."
+)
 
 excel_data = convert_df_to_excel(stock_df)
 
